@@ -1,0 +1,96 @@
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/i2c.h>
+#include <stdint.h>
+
+#include "oled.h"
+
+
+
+void clock_setup(void)
+{
+  rcc_periph_clock_enable(RCC_GPIOB);
+  rcc_periph_clock_enable(RCC_GPIOC);
+
+  rcc_periph_clock_enable(RCC_I2C1);
+}
+
+void gpio_setup(void)
+{
+  gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO13);
+
+  /*I2C*/
+  gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLUP, GPIO6 | GPIO7);
+  gpio_set_output_options(GPIOB, GPIO_OTYPE_OD, GPIO_OSPEED_25MHZ, GPIO6 | GPIO7);
+
+  /* I2C1 PB6 SCL1; PB7 SDA1*/
+  gpio_set_af(GPIOB, GPIO_AF4, GPIO6 | GPIO7);
+}
+
+void i2c_setup(void)
+{
+  i2c_reset(I2C1);
+  
+  i2c_set_speed(I2C1, i2c_speed_fm_400k, 16);
+  i2c_set_fast_mode(I2C1);
+  
+
+  /*
+  i2c_set_speed(I2C1, i2c_speed_sm_100k, 16);
+  i2c_set_standard_mode(I2C1);
+  */
+  
+
+  i2c_peripheral_enable(I2C1);
+}
+
+void scroll(void)
+{
+  oled_start_write();  
+  oled_write(0x00);
+  oled_write(0x26);
+  oled_write(0x00);
+  oled_write(0x00);
+  oled_write(0x00);
+  oled_write(0x07);
+  i2c_send_stop(I2C1);
+  
+  //oled_cmd_write(0x2F);
+}
+
+
+
+
+int main(void)
+{
+  clock_setup();
+  gpio_setup();
+  i2c_setup();
+
+  for(uint32_t i = 0; i <= 200000; i++)
+    {
+      __asm__("nop");
+    }
+
+  oled_init();
+
+  
+  oled_cmd_write(0x2E);
+  
+  oled_fill(0x00);
+  
+  uint8_t string[15] = "HELLO^WORLD";
+  
+  oled_printf(string, 14);
+  
+  //oled_zero();
+
+  scroll();
+
+  oled_cmd_write(0x2F);
+    
+  gpio_set(GPIOC, GPIO13);
+  return 0;
+}
+
+
