@@ -1,4 +1,7 @@
 [submodule "LOCM3-W25Qxx"]
 	path = LOCM3-W25Qxx
 	url = https://github.com/Fisiekk/LOCM3-W25Qxx
-	branch = origin/main
+	branch = main
+[submodule "LOCM3-24Cxx"]
+	path = LOCM3-24Cxx
+	url = https://github.com/Fisiekk/LOCM3-24Cxx
