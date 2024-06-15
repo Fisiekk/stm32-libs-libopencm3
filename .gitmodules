@@ -5,3 +5,4 @@
 [submodule "LOCM3-24Cxx"]
 	path = LOCM3-24Cxx
 	url = https://github.com/Fisiekk/LOCM3-24Cxx
+	branch = main
